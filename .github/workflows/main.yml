@@ -1,0 +1,33 @@
+name: 'Build files and push to another repo'
+
+on: [push, delete]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+        with:
+          persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
+          submodules: true  # Fetch Hugo themes
+          fetch-depth: 0    # Fetch all history for .GitInfo and .Lastmod
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: '0.69.0'
+
+      - name: Build
+        run:  |
+          git submodule add https://github.com/janraasch/hugo-bearblog.git themes/hugo-bearblog
+          hugo --gc --minify
+      
+      - name: Pushes to another repository
+        uses: cpina/github-action-push-to-another-repository@master
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.ACCESS_TOKEN }}
+        with:
+          source-directory: 'public'
+          destination-github-username: '1opc'
+          destination-repository-name: '1opc.github.io'
+          user-email: actions@github.com
