@@ -19,7 +19,6 @@ jobs:
 
       - name: Build
         run:  |
-          git submodule add https://github.com/janraasch/hugo-bearblog.git themes/hugo-bearblog
           hugo --gc --minify
       
       - name: Pushes to another repository
